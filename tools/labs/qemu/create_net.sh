@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 if test $# -ne 1; then
     echo "Usage: $0 <device>" 1>&2

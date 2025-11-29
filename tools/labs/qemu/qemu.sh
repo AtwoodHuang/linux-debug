@@ -5,6 +5,7 @@
 # allocation is dynamic, it is preferable to have a stable path to
 # avoid visual inspection of the qemu output when connecting to the
 # serial console.
+set -x
 
 SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
 

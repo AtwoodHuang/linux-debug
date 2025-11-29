@@ -1,0 +1,51 @@
+mkdir /tmp/tmp.tXYQxIQXmC
+sudo mount -t ext4 -o loop core-image-minimal-qemux86.ext4 /tmp/tmp.tXYQxIQXmC
+sudo make -C /home/huangzhe/linux-debug/linux modules_install INSTALL_MOD_PATH=/tmp/tmp.tXYQxIQXmC
+make: Entering directory '/home/huangzhe/linux-debug/linux'
+  DEPMOD  5.10.14+
+make: Leaving directory '/home/huangzhe/linux-debug/linux'
+sudo umount /tmp/tmp.tXYQxIQXmC
+rmdir /tmp/tmp.tXYQxIQXmC
+sleep 1 && touch .modinst
+qemu/create_net.sh lkt-tap0
++ test 1 -ne 1
++ device=lkt-tap0
+++ whoami
++ USER=huangzhe
++ case "$device" in
++ subnet=172.213.0
++ /sbin/ip link show dev lkt-tap0
++ sudo ip tuntap add mode tap user huangzhe dev lkt-tap0
++ sudo /sbin/ip address flush dev lkt-tap0
++ sudo /sbin/ip link set dev lkt-tap0 down
++ sudo /sbin/ip address add 172.213.0.1/24 dev lkt-tap0
++ sudo /sbin/ip link set dev lkt-tap0 up
++ sudo dnsmasq --port=0 --no-resolv --no-hosts --bind-interfaces --interface lkt-tap0 -F 172.213.0.2,172.213.0.20 --listen-address 172.213.0.1 -x /tmp/dnsmasq-lkt-tap0.pid -l /tmp/dnsmasq-lkt-tap0.leases
+qemu/create_net.sh lkt-tap1
++ test 1 -ne 1
++ device=lkt-tap1
+++ whoami
++ USER=huangzhe
++ case "$device" in
++ subnet=172.30.0
++ /sbin/ip link show dev lkt-tap1
++ sudo ip tuntap add mode tap user huangzhe dev lkt-tap1
++ sudo /sbin/ip address flush dev lkt-tap1
++ sudo /sbin/ip link set dev lkt-tap1 down
++ sudo /sbin/ip address add 172.30.0.1/24 dev lkt-tap1
++ sudo /sbin/ip link set dev lkt-tap1 up
++ sudo dnsmasq --port=0 --no-resolv --no-hosts --bind-interfaces --interface lkt-tap1 -F 172.30.0.2,172.30.0.20 --listen-address 172.30.0.1 -x /tmp/dnsmasq-lkt-tap1.pid -l /tmp/dnsmasq-lkt-tap1.leases
+/home/huangzhe/linux-debug/linux/tools/labs/templates/assignments/6-e100/nttcp -v -i &
+nttcp-l: nttcp, version 1.47
+nttcp-l: running in inetd mode on port 5037 - ignoring options beside -v and -p
+ARCH=x86 qemu/qemu.sh -kernel /home/huangzhe/linux-debug/linux/arch/x86/boot/bzImage -device virtio-serial -chardev pty,id=virtiocon0 -device virtconsole,chardev=virtiocon0 -serial pipe:pipe1 -serial pipe:pipe2 -netdev tap,id=lkt-tap0,ifname=lkt-tap0,script=no,downscript=no -net nic,netdev=lkt-tap0,model=virtio -netdev tap,id=lkt-tap1,ifname=lkt-tap1,script=no,downscript=no -net nic,netdev=lkt-tap1,model=i82559er -drive file=core-image-minimal-qemux86.ext4,if=virtio,format=raw -drive file=disk1.img,if=virtio,format=raw -drive file=disk2.img,if=virtio,format=raw --append "root=/dev/vda loglevel=15 console=hvc0 pci=noacpi" --display none -s -m 256
+++ dirname qemu/qemu.sh
++ SCRIPT_DIR=qemu
++ case $ARCH in
++ qemu=qemu-system-i386
++ echo info chardev
++ nc -U -l qemu.mon
++ qemu-system-i386 -kernel /home/huangzhe/linux-debug/linux/arch/x86/boot/bzImage -device virtio-serial -chardev pty,id=virtiocon0 -device virtconsole,chardev=virtiocon0 -serial pipe:pipe1 -serial pipe:pipe2 -netdev tap,id=lkt-tap0,ifname=lkt-tap0,script=no,downscript=no -net nic,netdev=lkt-tap0,model=virtio -netdev tap,id=lkt-tap1,ifname=lkt-tap1,script=no,downscript=no -net nic,netdev=lkt-tap1,model=i82559er -drive file=core-image-minimal-qemux86.ext4,if=virtio,format=raw -drive file=disk1.img,if=virtio,format=raw -drive file=disk2.img,if=virtio,format=raw --append 'root=/dev/vda loglevel=15 console=hvc0 pci=noacpi' --display none -s -m 256 -monitor unix:qemu.mon
++ xargs -I PTS ln -fs PTS serial.pts
++ egrep --line-buffered -o '/dev/pts/[0-9]*'
+char device redirected to /dev/pts/4 (label virtiocon0)

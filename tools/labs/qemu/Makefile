@@ -31,7 +31,21 @@ ifdef ENABLE_KVM
 QEMU_OPTS += -enable-kvm -cpu host
 ENABLE_KVM_SUDO = sudo
 endif
-
+#boot流程如下:
+#(1) 编译内核代码(在.modinst里面)
+#(2) kconfig: 先把事先准备好的.config文件拷贝到内核目录下(这个应该本来是用make config, 或者make memuconfig 配置的)
+#(3) make olddefconfig 使用之前复制的.config配置内核
+#(4) make mod2yesconfig 应该是把所有内核模块都加入构建
+#(5) make 构建内核
+#(6) make modules 编译模块（这里貌似没有）
+#(7) 下载yocto镜像，就是个文件系统(里面有些linux命令行之类的)，调用prepare-image脚本开始搞镜像
+#(8) 裁剪镜像大小（这个暂时不明白），挂载，在镜像目录上make modules_install，安装模块
+#(9) 创建一个空文件.modinst告诉makefile内核已经编译过了
+#(10) 下面开始创建网络，
+#(11) ip tuntap add 添加网卡 172.213.0, 172.30.0
+#(12) dnsmasq 配置dhcp
+#(13) 创建管道
+#(14) 创建两个100M的文件系统
 boot: .modinst lkt-tap0 lkt-tap1 pipe1.in pipe1.out pipe2.in pipe2.out disk1.img disk2.img nttcp-run
 	$(ENABLE_KVM_SUDO) ARCH=$(ARCH) qemu/qemu.sh $(QEMU_OPTS)
 

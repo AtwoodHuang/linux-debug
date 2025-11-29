@@ -15,3 +15,4 @@ for device in lkt-tap0 lkt-tap1 lkt-tap-smbd; do
   fi
   sudo ip tuntap del $device mode tap
 done
+killall nttcp
