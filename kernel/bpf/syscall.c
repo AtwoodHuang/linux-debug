@@ -3018,7 +3018,6 @@ static int bpf_prog_attach(const union bpf_attr *attr)
 
 	if (ret)
 		bpf_prog_put(prog);
-		bpf_prog_put(prog);
 	return ret;
 }
 
